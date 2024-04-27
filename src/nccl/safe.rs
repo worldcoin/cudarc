@@ -8,10 +8,10 @@ pub use result::{group_end, group_start};
 
 #[derive(Debug)]
 pub struct Comm {
-    comm: sys::ncclComm_t,
-    device: Arc<CudaDevice>,
-    rank: usize,
-    world_size: usize,
+    pub comm: sys::ncclComm_t,
+    pub device: Arc<CudaDevice>,
+    pub rank: usize,
+    pub world_size: usize,
 }
 
 #[derive(Debug, Clone, Copy)]
