@@ -113,17 +113,17 @@ pub unsafe fn comm_init_all(
 /// See [cuda docs](https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/api/comms.html?ncclcommsplit)
 /// # Safety
 /// User is in charge of sending valid pointers.
-pub unsafe fn comm_split(
-    comm: sys::ncclComm_t,
-    color: ::core::ffi::c_int,
-    key: ::core::ffi::c_int,
-    newcomm: *mut sys::ncclComm_t,
-    config: *mut sys::ncclConfig_t,
-) -> Result<NcclStatus, NcclError> {
-    lib()
-        .ncclCommSplit(comm, color, key, newcomm, config)
-        .result()
-}
+// pub unsafe fn comm_split(
+//     comm: sys::ncclComm_t,
+//     color: ::core::ffi::c_int,
+//     key: ::core::ffi::c_int,
+//     newcomm: *mut sys::ncclComm_t,
+//     config: *mut sys::ncclConfig_t,
+// ) -> Result<NcclStatus, NcclError> {
+//     lib()
+//         .ncclCommSplit(comm, color, key, newcomm, config)
+//         .result()
+// }
 
 /// See [cuda docs](https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/api/comms.html?ncclcommcount)
 /// # Safety
