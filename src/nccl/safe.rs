@@ -241,7 +241,7 @@ impl Comm {
 
     pub fn broadcast<T: NcclType>(
         &self,
-        sendbuff: &Option<CudaSlice<T>>,
+        sendbuff: &Option<&CudaSlice<T>>,
         recvbuff: &mut CudaSlice<T>,
         root: i32,
     ) -> Result<result::NcclStatus, result::NcclError> {
