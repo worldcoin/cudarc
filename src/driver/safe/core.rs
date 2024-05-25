@@ -194,7 +194,7 @@ impl Drop for CudaDevice {
 /// by the [CudaFunction]**.
 #[derive(Debug)]
 pub struct CudaSlice<T> {
-    pub cu_device_ptr: sys::CUdeviceptr,
+    pub(crate) cu_device_ptr: sys::CUdeviceptr,
     pub(crate) len: usize,
     pub(crate) device: Arc<CudaDevice>,
     pub(crate) host_buf: Option<Pin<Vec<T>>>,
@@ -261,7 +261,7 @@ unsafe impl Sync for CudaModule {}
 /// Wrapper around [sys::CUfunction]. Used by [crate::driver::LaunchAsync].
 #[derive(Debug, Clone)]
 pub struct CudaFunction {
-    pub(crate) cu_function: sys::CUfunction,
+    pub cu_function: sys::CUfunction,
     pub(crate) device: Arc<CudaDevice>,
 }
 
