@@ -194,6 +194,7 @@ pub struct CompileOptions {
     pub maxrregcount: Option<usize>,
     pub include_paths: Vec<String>,
     pub arch: Option<&'static str>,
+    pub cublas: Option<bool>,
 }
 
 impl CompileOptions {
@@ -230,6 +231,10 @@ impl CompileOptions {
 
         if let Some(arch) = self.arch {
             options.push(std::format!("--gpu-architecture={arch}"))
+        }
+
+        if let Some(v) = self.cublas {
+            options.push(std::format!("-lcublas"));
         }
 
         options
