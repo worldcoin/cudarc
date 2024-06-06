@@ -1,18 +1,22 @@
+use super::sys::SafeCommPtr;
 use super::{result, sys};
 use crate::driver::{CudaDevice, CudaSlice};
 use std::mem::MaybeUninit;
 use std::ptr;
+use std::sync::Mutex;
 use std::{sync::Arc, vec, vec::Vec};
 
 pub use result::{group_end, group_start};
 
 #[derive(Debug)]
 pub struct Comm {
-    pub comm: sys::ncclComm_t,
+    pub comm: Arc<SafeCommPtr>,
     pub device: Arc<CudaDevice>,
     pub rank: usize,
     pub world_size: usize,
 }
+
+unsafe impl Sync for Comm {}
 
 #[derive(Debug, Clone, Copy)]
 pub struct Id {
@@ -57,7 +61,7 @@ impl Drop for Comm {
     fn drop(&mut self) {
         // TODO(thenerdstation): Shoule we instead do finalize then destory?
         unsafe {
-            result::comm_abort(self.comm).expect("Error when aborting Comm.");
+            result::comm_abort(self.comm.0).expect("Error when aborting Comm.");
         }
     }
 }
@@ -125,7 +129,7 @@ impl Comm {
             .zip(devices.iter().cloned())
             .enumerate()
             .map(|(rank, (comm, device))| Self {
-                comm,
+                comm: Arc::new(SafeCommPtr(comm)),
                 device,
                 rank,
                 world_size: n_devices,
@@ -195,7 +199,7 @@ impl Comm {
             comm.assume_init()
         };
         Ok(Self {
-            comm,
+            comm: Arc::new(SafeCommPtr(comm)),
             device,
             rank,
             world_size,
@@ -215,7 +219,7 @@ impl Comm {
                 data.len,
                 T::as_nccl_type(),
                 peer,
-                self.comm,
+                self.comm.0,
                 self.device.stream as *mut _,
             )?;
         }
@@ -233,7 +237,7 @@ impl Comm {
                 buff.len,
                 T::as_nccl_type(),
                 peer,
-                self.comm,
+                self.comm.0,
                 self.device.stream as *mut _,
             )
         }
@@ -256,7 +260,7 @@ impl Comm {
                 recvbuff.len,
                 T::as_nccl_type(),
                 root,
-                self.comm,
+                self.comm.0,
                 self.device.stream as *mut _,
             )
         }
@@ -273,7 +277,7 @@ impl Comm {
                 recvbuff.cu_device_ptr as *mut _,
                 sendbuff.len,
                 T::as_nccl_type(),
-                self.comm,
+                self.comm.0,
                 self.device.stream as *mut _,
             )
         }
@@ -292,7 +296,7 @@ impl Comm {
                 sendbuff.len,
                 T::as_nccl_type(),
                 convert_to_nccl_reduce_op(reduce_op),
-                self.comm,
+                self.comm.0,
                 self.device.stream as *mut _,
             )
         }
@@ -313,7 +317,7 @@ impl Comm {
                 T::as_nccl_type(),
                 convert_to_nccl_reduce_op(reduce_op),
                 root,
-                self.comm,
+                self.comm.0,
                 self.device.stream as *mut _,
             )
         }
@@ -332,7 +336,7 @@ impl Comm {
                 recvbuff.len,
                 T::as_nccl_type(),
                 convert_to_nccl_reduce_op(reduce_op),
-                self.comm,
+                self.comm.0,
                 self.device.stream as *mut _,
             )
         }

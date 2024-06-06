@@ -13,6 +13,12 @@ pub struct ncclComm {
     _unused: [u8; 0],
 }
 pub type ncclComm_t = *mut ncclComm;
+
+#[derive(Debug, Copy, Clone)]
+pub struct SafeCommPtr(pub ncclComm_t);
+
+unsafe impl Send for SafeCommPtr {}
+
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialOrd, Ord, PartialEq, Eq)]
 pub struct ncclUniqueId {
