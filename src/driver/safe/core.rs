@@ -563,6 +563,22 @@ impl<'a, T> CudaView<'a, T> {
             marker: PhantomData,
         })
     }
+
+    /// Reinterprets the slice of memory into a different type. `len` is the number
+    /// of elements of the new type `S` that are expected. If not enough bytes
+    /// are allocated in `self` for the view, then this returns `None`.
+    ///
+    /// # Safety
+    /// This is unsafe because not the memory for the view may not be a valid interpretation
+    /// for the type `S`.
+    pub unsafe fn transmute<S>(&self, len: usize) -> Option<CudaView<'_, S>> {
+        (len * std::mem::size_of::<S>() <= self.num_bytes()).then_some(CudaView {
+            root: self.root,
+            ptr: self.ptr,
+            len,
+            marker: PhantomData,
+        })
+    }
 }
 
 /// A mutable sub-view into a [CudaSlice] created by [CudaSlice::try_slice_mut()].
@@ -627,6 +643,23 @@ impl<'a, T> CudaViewMut<'a, T> {
         })
     }
 
+
+    /// Reinterprets the slice of memory into a different type. `len` is the number
+    /// of elements of the new type `S` that are expected. If not enough bytes
+    /// are allocated in `self` for the view, then this returns `None`.
+    ///
+    /// # Safety
+    /// This is unsafe because not the memory for the view may not be a valid interpretation
+    /// for the type `S`.
+    pub unsafe fn transmute<S>(&self, len: usize) -> Option<CudaView<'_, S>> {
+        (len * std::mem::size_of::<S>() <= self.num_bytes()).then_some(CudaView {
+            root: self.root,
+            ptr: self.ptr,
+            len,
+            marker: PhantomData,
+        })
+    }
+
     /// Creates a [CudaViewMut] at the specified offset from the start of `self`.
     ///
     /// Returns `None` if `offset >= self.len`
@@ -643,6 +676,22 @@ impl<'a, T> CudaViewMut<'a, T> {
             ptr: self.ptr + (start * std::mem::size_of::<T>()) as u64,
             root: self.root,
             len: end - start,
+            marker: PhantomData,
+        })
+    }
+
+     /// Reinterprets the slice of memory into a different type. `len` is the number
+    /// of elements of the new type `S` that are expected. If not enough bytes
+    /// are allocated in `self` for the view, then this returns `None`.
+    ///
+    /// # Safety
+    /// This is unsafe because not the memory for the view may not be a valid interpretation
+    /// for the type `S`.
+    pub unsafe fn transmute_mut<S>(&mut self, len: usize) -> Option<CudaViewMut<'_, S>> {
+        (len * std::mem::size_of::<S>() <= self.num_bytes()).then_some(CudaViewMut {
+            ptr: self.ptr,
+            root: self.root,
+            len,
             marker: PhantomData,
         })
     }
