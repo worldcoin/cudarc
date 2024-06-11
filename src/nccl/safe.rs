@@ -1,6 +1,6 @@
 use super::sys::SafeCommPtr;
 use super::{result, sys};
-use crate::driver::{CudaDevice, CudaSlice};
+use crate::driver::{CudaDevice, CudaSlice, CudaView};
 use std::mem::MaybeUninit;
 use std::ptr;
 use std::sync::Mutex;
