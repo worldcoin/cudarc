@@ -517,8 +517,10 @@ pub unsafe fn malloc_async(
 ) -> Result<sys::CUdeviceptr, DriverError> {
     let mut dev_ptr = MaybeUninit::uninit();
     lib()
-        .cuMemAllocAsync(dev_ptr.as_mut_ptr(), num_bytes, stream)
-        .result()?;
+    .cuMemAllocAsync(dev_ptr.as_mut_ptr(), num_bytes, stream)
+    .result()?;
+    let start = dev_ptr.as_ptr() as u64;
+    println!("malloc_async: {:#x} - {:#x}", start, start + num_bytes as u64);
     Ok(dev_ptr.assume_init())
 }
 
@@ -533,6 +535,8 @@ pub unsafe fn malloc_sync(num_bytes: usize) -> Result<sys::CUdeviceptr, DriverEr
     lib()
         .cuMemAlloc_v2(dev_ptr.as_mut_ptr(), num_bytes)
         .result()?;
+    let start = dev_ptr.as_ptr() as u64;
+    println!("malloc_async: {:#x} - {:#x}", start, start + num_bytes as u64);
     Ok(dev_ptr.assume_init())
 }
 
