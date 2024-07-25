@@ -522,7 +522,7 @@ pub unsafe fn malloc_async(
     let dev_ptr: sys::CUdeviceptr = dev_ptr.assume_init();
     let start = dev_ptr.device_ptr() as u64;
     println!("malloc_async: {:#x} - {:#x}", start, start + num_bytes as u64);
-    Ok(dev_ptr.assume_init())
+    Ok(dev_ptr)
 }
 
 /// Allocates memory
@@ -539,7 +539,7 @@ pub unsafe fn malloc_sync(num_bytes: usize) -> Result<sys::CUdeviceptr, DriverEr
     let dev_ptr: sys::CUdeviceptr = dev_ptr.assume_init();
     let start = dev_ptr.device_ptr() as u64;
     println!("malloc_async: {:#x} - {:#x}", start, start + num_bytes as u64);
-    Ok(dev_ptr.assume_init())
+    Ok(dev_ptr)
 }
 
 /// Frees memory with stream ordered semantics.
